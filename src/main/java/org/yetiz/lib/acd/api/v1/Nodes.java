@@ -1,12 +1,16 @@
 package org.yetiz.lib.acd.api.v1;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.asynchttpclient.Request;
+import org.asynchttpclient.RequestBuilder;
+import org.asynchttpclient.Response;
+import org.asynchttpclient.request.body.multipart.ByteArrayPart;
+import org.asynchttpclient.request.body.multipart.FilePart;
+import org.asynchttpclient.request.body.multipart.StringPart;
 import org.yetiz.lib.acd.ACDSession;
 import org.yetiz.lib.acd.Utils;
 import org.yetiz.lib.acd.Entity.AssetInfo;
@@ -18,18 +22,11 @@ import org.yetiz.lib.acd.Entity.NodeInfo;
 import org.yetiz.lib.acd.Entity.NodeInfoList;
 import org.yetiz.lib.acd.Entity.Properties;
 import org.yetiz.lib.acd.Entity.Property;
-import org.yetiz.lib.acd.exception.BadContentException;
 import org.yetiz.lib.utils.Log;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
-import com.ning.http.client.multipart.ByteArrayPart;
-import com.ning.http.client.multipart.FilePart;
-import com.ning.http.client.multipart.StringPart;
 
 /**
  * Created by yeti on 2015/4/13.
@@ -131,11 +128,7 @@ public class Nodes {
 			.setMethod("GET")
 			.build();
 		Response response = acdSession.execute(request);
-		try {
-			return response.getResponseBodyAsStream();
-		} catch (IOException e) {
-			throw new BadContentException("getResponseBodyAsStream()");
-		}
+		return response.getResponseBodyAsStream();
 	}
 
 	/**
@@ -170,7 +163,7 @@ public class Nodes {
 		if (startToken != null) {
 			resourceEndpoint = Utils.stringFormatter("{}&startToken={}", resourceEndpoint, startToken);
 		}
-		if (startToken != sort) {
+		if (!sort.equals(startToken)) {
 			resourceEndpoint = Utils.stringFormatter("{}&sort={}", resourceEndpoint, sort);
 		}
 		if (limit != null && limit > 0) {
@@ -217,7 +210,7 @@ public class Nodes {
 		if (withTempLink) {
 			resourceEndpoint = Utils.stringAppender(resourceEndpoint, "tempLink=true");
 		}
-		if (withAsset != null && withAsset != "") {
+		if (withAsset != null && !withAsset.isEmpty()) {
 			resourceEndpoint = Utils.stringAppender(resourceEndpoint, "&asset=", withAsset);
 		}
 		Response response = acdSession.execute(new RequestBuilder()
@@ -446,11 +439,10 @@ public class Nodes {
 			.setMethod("GET")
 			.build());
 
-		JsonObject responseObject = ((JsonObject) new JsonParser().parse(Utils.getResponseBody(response)));
-		List<NodeInfo> data = new ArrayList<NodeInfo>();
-		for (Iterator<JsonElement> iterator = responseObject.get("data").getAsJsonArray().iterator();
-		     iterator.hasNext(); ) {
-			JsonObject object = ((JsonObject) iterator.next());
+		JsonObject responseObject = ((JsonObject) JsonParser.parseString(Utils.getResponseBody(response)));
+		List<NodeInfo> data = new ArrayList<>();
+		for (JsonElement jsonElement : responseObject.get("data").getAsJsonArray()) {
+			JsonObject object = ((JsonObject) jsonElement);
 			if (object.get("kind").getAsString().equals("FILE")) {
 				data.add(Utils.getGson().fromJson(object, FileInfo.class));
 			}
