@@ -1,15 +1,5 @@
 package org.yetiz.lib.acd;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
-import com.google.gson.internal.bind.DateTypeAdapter;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.JsonWriter;
-
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -18,6 +8,15 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+
 /**
  * Created by yeti on 4/15/15.
  */
@@ -25,11 +24,32 @@ public final class DateAdapter extends TypeAdapter<Date> {
 	public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
 		@SuppressWarnings("unchecked") // we use a runtime check to make sure the 'T's equal
 		public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> typeToken) {
-			return typeToken.getRawType() == Date.class ? (TypeAdapter<T>) new DateTypeAdapter() : null;
+			return typeToken.getRawType() == Date.class ? (TypeAdapter<T>) new MyDateAdapter() : null;
 		}
 	};
 
-	private final DateFormat enUsFormat
+    public static class MyDateAdapter extends TypeAdapter<Date> {
+        @Override
+        public void write(JsonWriter out, Date value) throws IOException {
+            if (value == null) {
+                out.nullValue();
+                return;
+            }
+            out.value(value.getTime()); // emit as long (milliseconds since epoch)
+        }
+
+        @Override
+        public Date read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            long millis = in.nextLong();
+            return new Date(millis);
+        }
+    }
+
+    private final DateFormat enUsFormat
 		= DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.US);
 	private final DateFormat localFormat
 		= DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT);
