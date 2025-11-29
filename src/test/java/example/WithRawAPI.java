@@ -95,7 +95,7 @@ public class WithRawAPI {
 
 	public static ACDSession getACDSession(String[] args, Configure configure) {
 		ACDSession acdSession = null;
-		if (configure.getAccessToken().equals("")) {
+		if (configure.getAccessToken().isEmpty()) {
 			if (args.length == 2)
 				acdSession = ACDSession.getACDSessionByCode(configure, args[1]);
 			else {

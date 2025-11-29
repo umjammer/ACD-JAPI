@@ -1,5 +1,10 @@
 package org.yetiz.lib.acd;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.time.Duration;
+import java.util.Calendar;
+
 import com.google.gson.JsonObject;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.AsyncHttpClientConfig;
@@ -16,9 +21,8 @@ import org.yetiz.lib.acd.exception.BadParameterException;
 import org.yetiz.lib.acd.exception.InvalidAuthTokenException;
 import org.yetiz.lib.utils.Log;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Calendar;
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
+
 
 /**
  * Created by yeti on 2015/4/13.
@@ -47,10 +51,10 @@ public class ACDSession {
 		Log.d("Timeout set to " + timeoutMs);
 		AsyncHttpClientConfig asyncHttpClientConfig = new DefaultAsyncHttpClientConfig.Builder()
 			.setFollowRedirect(false)
-			.setConnectTimeout(timeoutMs)
-			.setReadTimeout(timeoutMs)
-			.setRequestTimeout(timeoutMs)
-			.setPooledConnectionIdleTimeout(timeoutMs)
+			.setConnectTimeout(Duration.of(timeoutMs, MICROSECONDS.toChronoUnit()))
+			.setReadTimeout(Duration.of(timeoutMs, MICROSECONDS.toChronoUnit()))
+			.setRequestTimeout(Duration.of(timeoutMs, MICROSECONDS.toChronoUnit()))
+			.setPooledConnectionIdleTimeout(Duration.of(timeoutMs, MICROSECONDS.toChronoUnit()))
 			.build();
 		this.asyncHttpClient = new DefaultAsyncHttpClient(asyncHttpClientConfig);
 	}
@@ -205,7 +209,7 @@ public class ACDSession {
 	}
 
 	private Request setAuthHeader(Request request) {
-		return new RequestBuilder(request).setHeader("Authorization", acdToken.getAuthorizationString()).build();
+		return new RequestBuilder(request.getMethod()).setHeader("Authorization", acdToken.getAuthorizationString()).build();
 	}
 
 	private void updateTokenOfConfigureFile() {
