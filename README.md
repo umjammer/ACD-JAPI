@@ -1,14 +1,14 @@
 [![Release](https://jitpack.io/v/umjammer/ACD-JAPI.svg)](https://jitpack.io/#umjammer/ACD-JAPI)
-[![Java CI with Maven](https://github.com/umjammer/ACD-JAPI/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/ACD-JAPI/actions)
+[![Java CI](https://github.com/umjammer/ACD-JAPI/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/ACD-JAPI/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/ACD-JAPI/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/umjammer/ACD-JAPI/actions/workflows/codeql-analysis.yml)
-![Java](https://img.shields.io/badge/Java-8-b07219)
+![Java](https://img.shields.io/badge/Java-17-b07219)
 [![Parent](https://img.shields.io/badge/Parent-vavi--apps--fuse-pink)](https://github.com/umjammer/vavi-apps-fuse)
 
 # ACD-JAPI
 ## Amazon Cloud Drive Java API (unofficial)
 This project provide a Java version of Amazon Cloud Drive API from REST version.
 
-## Maven Repository
+## Install
 
 Maven/Gradle
 
